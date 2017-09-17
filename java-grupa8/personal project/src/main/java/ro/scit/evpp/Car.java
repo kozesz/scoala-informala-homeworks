@@ -1,8 +1,8 @@
-package main.java.ro.scit.evpp;
+package ro.scit.evpp;
 
 /**
  * Created by Eszter on 8/25/2017
- * Electronis Vehicle class contains all the car's caracteristics.
+ * Electronic Vehicle class contains all the car's caracteristics.
  */
 
 public class Car {
@@ -16,5 +16,7 @@ public class Car {
     int price;
     boolean fastCharge;
     int horsePower;
+    int stockNumber;
+
 
 }
