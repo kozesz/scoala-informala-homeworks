@@ -12,6 +12,7 @@ public class Main {
      * Using bubble sort, sorting them in a descending order by revenue
      * Using the getTotalSales() method calculating the total sales amount for the entire company
      * Using the getBestSalesRep() method defining the best sales representative, who has the most revenue
+     * Using the bestDepartment() method calculating the total revenue per department
      */
 
     public static void main(String[] args) {
@@ -64,7 +65,8 @@ public class Main {
         SalesRepresentative bestOfSales = getBestSalesRep();
         System.out.println("Best sales representative is " + bestOfSales.name + " with a revenue of " + bestOfSales.revenue);
 
-    }
+        bestDepartment();
 
+    }
 
 }
