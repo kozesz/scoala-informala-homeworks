@@ -2,12 +2,14 @@ package ro.scit.evpp;
 
 import java.util.HashMap;
 
-public class GreenBonusProgram {
+public class GreenBonusProgram extends Thread {
 
-    private int buget = 19000;
+    private int buget = 38000;
     private HashMap<Customer, Car> history = new HashMap<>();
 
-    private int getBuget() { return buget; }
+    private int getBuget() {
+        return buget;
+    }
 
     public void setBuget(int buget) {
         this.buget = buget;
@@ -17,7 +19,7 @@ public class GreenBonusProgram {
         this.buget = buget;
     }
 
-    public int giveGreenBonus(Customer customer, Car c, int amount) {
+    public int giveGreenBonus(Customer customer, Car c, int amount) throws InsufficientFundsException {
         int bonus = 0;
         if (getBuget() >= (10000 * amount)) {
             bonus = amount * 10000;
@@ -30,11 +32,16 @@ public class GreenBonusProgram {
                 buget = (buget - bonus);
                 history.put(customer, c);
                 System.out.println("Congratulations, you got the bonus of " + bonus);
-            } else {
-                System.out.println("There is not buget left.");
-            }
+            } else throw new InsufficientFundsException();
         }
         return bonus;
     }
+
+    public class InsufficientFundsException extends Exception {
+        public InsufficientFundsException() {
+            System.out.println("There is not buget left.");
+        }
+    }
+
 
 }

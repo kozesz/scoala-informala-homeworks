@@ -17,7 +17,7 @@ public class DealershipTests {
     Car selectedCar2 = new Car("Renault", "Zoe", true, 33000, 68, 210, true);
     Car selectedCar3 = new Car("Volkswagen", "e-UP", true, 25000, 160, 160, true);
 
-    Customer customer = new Customer("Eszter");
+    Customer customer = new Customer("Eszter", 50000);
 
     @Test
     public void addCarTestToEmptyList() {
@@ -50,7 +50,7 @@ public class DealershipTests {
     @Test
     public void removeLastCarTest() {
         testDealership.addCar(selectedCar, 1);
-        testDealership.removeNewCar(selectedCar,1);
+        testDealership.removeLastCar(selectedCar,1);
 
         assertEquals(0, testDealership.getCars().size());
         assertEquals(0, testDealership.getCarsInFleet().size(), 0);

@@ -9,13 +9,14 @@ public class Customer {
     private int buget = 66000;
     private HashMap<Car, Integer> customerFleet = new HashMap<>();
 
-    public Customer(String name) {
+    public Customer(String name, int buget) {
         this.name = name;
+        this.buget = buget;
     }
 
     public void buyCar(Car c, int amount) {
         System.out.println("The customer's initial buget is " + getBuget());
-        buget = buget - (amount * c.getPrice());
+        setBuget(getBuget() - (amount * c.getPrice()));
         putCarInFleet(c, amount);
     }
 
@@ -24,8 +25,7 @@ public class Customer {
     }
 
     public void receiveBonus(int bonus) {
-
-        buget = buget + bonus;
+        setBuget(getBuget() + bonus);
         System.out.println("The customer's buget after receiving the bonus is " + buget);
     }
 
@@ -33,7 +33,7 @@ public class Customer {
         return customerFleet;
     }
 
-    public float getBuget() {
+    public int getBuget() {
         return buget;
     }
 

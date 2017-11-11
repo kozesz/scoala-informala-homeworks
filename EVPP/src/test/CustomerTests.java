@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 public class CustomerTests {
 
     Car carToBuy = new Car("Volkswagen", "e-UP", true, 25000, 60, 160, true);
-    Customer testCustomer = new Customer("Test");
+    Customer testCustomer = new Customer("Test", 50000);
 
     @Test
     public void testBuyCar() {

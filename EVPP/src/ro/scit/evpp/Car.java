@@ -54,8 +54,8 @@ public class Car implements Comparable<Car> {
     }
 
     public static Comparator<Car> priceComparator = (o1, o2) -> {
-        int carPrice1 = (int) o1.getPrice();
-        int carPrice2 = (int) o2.getPrice();
+        int carPrice1 = o1.getPrice();
+        int carPrice2 = o2.getPrice();
         return carPrice1 - carPrice2;
     };
 

@@ -5,17 +5,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-public class Dealership {
+public class Dealership extends Thread {
 
-    Customer customer = new Customer("Eszter");
+
     GreenBonusProgram greenBonusProgram = new GreenBonusProgram();
     private HashSet<Car> cars = new HashSet<>();
+    private HashMap<Car, Integer> carsToBuy = new HashMap<>();
     private HashMap<Car, Integer> soldCars = new HashMap<>();
     private HashMap<Car, Integer> fleetOfCars = new HashMap<>();
     private HashMap<Customer, Car> historyOfSales = new HashMap<>();
-    Car selectedCarToBuy = null;
-    private int amountOfCar = 0;
     private int revenue = 0;
+
 
     public void readMyCars() throws IOException {
         CarCSVReader carReader = new CarCSVReader(new BufferedReader(new FileReader("cars.csv")));
@@ -26,14 +26,13 @@ public class Dealership {
         carReader.close();
     }
 
-    public void readSelectedCarToBuy() throws IOException {
-        CarCSVReader carToBuyReader = new CarCSVReader(new BufferedReader(new FileReader("carToBuy.csv")));
-        Map<Car, Integer> carToBuyIntegerMap = carToBuyReader.readCars();
-        for (Car car : carToBuyIntegerMap.keySet()) {
-            selectedCarToBuy = car;
-            amountOfCar = carToBuyIntegerMap.get(car);
+    public void readMyCarsToBuy() throws IOException {
+        CarCSVReader carReader = new CarCSVReader(new BufferedReader(new FileReader("carToBuy.csv")));
+        Map<Car, Integer> carIntegerMap = carReader.readCars();
+        for (Car car : carIntegerMap.keySet()) {
+            addCarToBuy(car, carIntegerMap.get(car));
         }
-        carToBuyReader.close();
+        carReader.close();
     }
 
     public void addCar(Car c, int stockNumber) {
@@ -43,6 +42,11 @@ public class Dealership {
             addNewCar(c, stockNumber);
         }
     }
+
+    public void addCarToBuy(Car c, int stockNumber) {
+        carsToBuy.put(c, stockNumber);
+    }
+
 
     private void addNewCar(Car c, int stockNumber) {
         cars.add(c);
@@ -57,13 +61,13 @@ public class Dealership {
     public void removeCar(Car c, int stockNumber) {
         int count = fleetOfCars.get(c);
         if (count == 1) {
-            removeNewCar(c, stockNumber);
+            removeLastCar(c, stockNumber);
         } else {
             decreaseStockNumber(c, stockNumber);
         }
     }
 
-    public void removeNewCar(Car c, int stockNumber) {
+    public void removeLastCar(Car c, int stockNumber) {
         cars.remove(c);
         fleetOfCars.remove(c, stockNumber);
     }
@@ -91,9 +95,7 @@ public class Dealership {
         historyOfSales.put(customer, car);
     }
 
-
-    public void sellCar() {
-
+    public void sellCar(Car selectedCarToBuy, Integer amountOfCar, Customer customer) throws InsufficientFundsException, OutOfStockException {
         if (customer.getBuget() >= (selectedCarToBuy.getPrice() * amountOfCar)) {
             if (getCarsInFleet().containsKey(selectedCarToBuy)) {
                 soldCars.put(selectedCarToBuy, amountOfCar);
@@ -103,34 +105,37 @@ public class Dealership {
                 customer.buyCar(selectedCarToBuy, amountOfCar);
                 System.out.println("The customer's remaining buget is " + customer.getBuget());
                 System.out.println("The customer's car(s): " + customer.getCustomerFleet());
-                if (selectedCarToBuy.isItNew()) {
-                    customer.receiveBonus(greenBonusProgram.giveGreenBonus(customer, selectedCarToBuy, amountOfCar));
-                } else System.out.println("The car you bought is not new, you don't get the 10.000 euro bonus.");
-            } else System.out.println("You can't buy this car, it is out of stock.");
-        } else {
-            System.out.println("You can't buy this car, you don't have enough money.");
-        }
+                System.out.println("The dealership's revenue is " + getRevenue());
+            } else throw new OutOfStockException();
+        } else throw new InsufficientFundsException();
     }
 
-    public ArrayList getCarsSortedByPrice() {
+    public void requestGreenBonus(Car selectedCarToBuy, Integer amountOfCar, Customer customer) throws OldCarException, GreenBonusProgram.InsufficientFundsException {
+        if (selectedCarToBuy.isItNew()) {
+            customer.receiveBonus(greenBonusProgram.giveGreenBonus(customer, selectedCarToBuy, amountOfCar));
+        } else throw new OldCarException();
+    }
+
+
+    public ArrayList<Car> getCarsSortedByPrice() {
         ArrayList sorted = new ArrayList(cars);
         Collections.sort(sorted, Car.priceComparator);
         return sorted;
     }
 
-    public ArrayList getCarsSortedByHorsePower() {
+    public ArrayList<Car> getCarsSortedByHorsePower() {
         ArrayList sorted = new ArrayList(cars);
         Collections.sort(sorted, Car.horsePowerComparator);
         return sorted;
     }
 
-    public ArrayList getCarsSortedByRangePerCharge() {
+    public ArrayList<Car> getCarsSortedByRangePerCharge() {
         ArrayList sorted = new ArrayList(cars);
         Collections.sort(sorted, Car.rangePerChargeComparator);
         return sorted;
     }
 
-    public HashMap<Car, Integer> getCarsfilteredByFastCharge() {
+    public HashMap<Car, Integer> getCarsFilteredByFastCharge() {
         LinkedHashMap<Car, Integer> filteredList = new LinkedHashMap<>();
         for (Car c : cars) {
             if (c.isFastCharge() == true) {
@@ -160,4 +165,29 @@ public class Dealership {
         return historyOfSales;
     }
 
+    public HashMap<Car, Integer> getCarsToBuy() {
+        return carsToBuy;
+    }
+
+    public void setCarsToBuy(HashMap<Car, Integer> carsToBuy) {
+        this.carsToBuy = carsToBuy;
+    }
+
+    public class InsufficientFundsException extends Exception {
+        public InsufficientFundsException() {
+            System.out.println("You can't buy this car, you don't have enough money.");
+        }
+    }
+
+    public class OutOfStockException extends Exception {
+        public OutOfStockException() {
+            System.out.println("You can't buy this car, it is out of stock.");
+        }
+    }
+
+    public class OldCarException extends Exception {
+        public OldCarException() {
+            System.out.println("You can't request a Green Bonus, it's only for new cars.");
+        }
+    }
 }
